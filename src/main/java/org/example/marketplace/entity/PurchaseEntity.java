@@ -7,26 +7,24 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.data.annotation.CreatedDate;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 
 @Entity
-@Table(name = "purchases")
+@Table(name = "purchase")
 @Getter
 @Setter
 @EqualsAndHashCode
-@ToString
+@ToString(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class PurchaseEntity {
@@ -39,7 +37,8 @@ public class PurchaseEntity {
     private Long reviewId;
 
     @Column(name = "purchase_date")
-    private LocalDateTime purchaseDate;
+    @CreatedDate
+    private Timestamp purchaseDate;
 
     @Column(name = "price_at_purchase", precision = 19, scale = 2)
     private BigDecimal priceAtPurchase;
@@ -51,9 +50,4 @@ public class PurchaseEntity {
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
     private ProductEntity product;
-
-    @PrePersist
-    public void prePersist() {
-        purchaseDate = LocalDateTime.now();
-    }
 }
