@@ -7,7 +7,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -17,15 +16,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.data.annotation.CreatedDate;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 
 @Entity
-@Table(name = "reviews")
+@Table(name = "review")
 @Getter
 @Setter
 @EqualsAndHashCode
-@ToString
+@ToString(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReviewEntity {
@@ -46,7 +46,8 @@ public class ReviewEntity {
     private String comment;
 
     @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    @CreatedDate
+    private Timestamp createdAt;
 
     @ManyToOne
     @JoinColumn(name = "buyer_id", nullable = false)
@@ -55,9 +56,4 @@ public class ReviewEntity {
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
     private ProductEntity product;
-
-    @PrePersist
-    public void prePersist() {
-        createdAt = LocalDateTime.now();
-    }
 }
