@@ -1,33 +1,28 @@
 package org.example.marketplace.entity;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.util.List;
+import java.util.Objects;
+import java.util.StringJoiner;
 
 @Entity
 @Table(name = "product")
 @Getter
 @Setter
-@EqualsAndHashCode
-@ToString(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductEntity {
@@ -55,6 +50,27 @@ public class ProductEntity {
     @CreatedDate
     private Timestamp createdAt;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    private List<ReviewEntity> reviews;
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        ProductEntity that = (ProductEntity) o;
+        return Objects.equals(id, that.id) && Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(price, that.price) && Objects.equals(rating, that.rating) && Objects.equals(createdAt, that.createdAt);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, description, price, rating, createdAt);
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", ProductEntity.class.getSimpleName() + "[", "]")
+                .add("id=" + id)
+                .add("name='" + name + "'")
+                .add("description='" + description + "'")
+                .add("price=" + price)
+                .add("rating=" + rating)
+                .add("createdAt=" + createdAt)
+                .toString();
+    }
 }

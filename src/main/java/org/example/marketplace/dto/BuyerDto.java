@@ -1,20 +1,20 @@
-package org.example.marketplace.dto.response;
+package org.example.marketplace.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReviewResponseDto {
+public class BuyerDto {
 
     private Long id;
-    private Long buyerId;
-    private Long productId;
-    private Integer rating;
-    private String comment;
+    private String name;
+    private String email;
+    private BigDecimal balance;
     private Timestamp createdAt;
 }

@@ -1,21 +1,20 @@
-package org.example.marketplace.dto.request;
+package org.example.marketplace.dto;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.sql.Timestamp;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReviewRequestDto {
+public class ReviewDto {
 
+    private Long id;
     private Long buyerId;
-
-    @Min(1)
-    @Max(5)
+    private Long productId;
     private Integer rating;
-
     private String comment;
+    private Timestamp createdAt;
 }

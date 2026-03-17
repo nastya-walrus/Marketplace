@@ -5,27 +5,23 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.sql.Timestamp;
+import java.util.Objects;
+import java.util.StringJoiner;
 
 @Entity
 @Table(name = "review")
 @Getter
 @Setter
-@EqualsAndHashCode
-@ToString(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReviewEntity {
@@ -49,11 +45,27 @@ public class ReviewEntity {
     @CreatedDate
     private Timestamp createdAt;
 
-    @ManyToOne
-    @JoinColumn(name = "buyer_id", nullable = false)
-    private BuyerEntity buyer;
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        ReviewEntity that = (ReviewEntity) o;
+        return Objects.equals(id, that.id) && Objects.equals(buyerId, that.buyerId) && Objects.equals(productId, that.productId) && Objects.equals(rating, that.rating) && Objects.equals(comment, that.comment) && Objects.equals(createdAt, that.createdAt);
+    }
 
-    @ManyToOne
-    @JoinColumn(name = "product_id", nullable = false)
-    private ProductEntity product;
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, buyerId, productId, rating, comment, createdAt);
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", ReviewEntity.class.getSimpleName() + "[", "]")
+                .add("id=" + id)
+                .add("buyerId=" + buyerId)
+                .add("productId=" + productId)
+                .add("rating=" + rating)
+                .add("comment='" + comment + "'")
+                .add("createdAt=" + createdAt)
+                .toString();
+    }
 }
