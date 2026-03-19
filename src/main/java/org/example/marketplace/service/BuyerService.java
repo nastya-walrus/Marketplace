@@ -6,6 +6,7 @@ import jakarta.validation.constraints.DecimalMin;
 import lombok.RequiredArgsConstructor;
 import org.example.marketplace.dto.BuyerDto;
 import org.example.marketplace.entity.BuyerEntity;
+import org.example.marketplace.mapper.BuyerMapper;
 import org.example.marketplace.repository.BuyerRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +20,7 @@ import java.math.BigDecimal;
 public class BuyerService {
 
     private final BuyerRepository buyerRepository;
+    private final BuyerMapper buyerMapper;
 
     @Transactional
     public BuyerDto create(BuyerDto buyerDto) {
@@ -27,20 +29,16 @@ public class BuyerService {
             throw new IllegalArgumentException("Email already exists");
         }
 
-        BuyerEntity entity = new BuyerEntity();
-        entity.setName(buyerDto.getName());
-        entity.setEmail(buyerDto.getEmail());
-        entity.setBalance(buyerDto.getBalance());
-
+        BuyerEntity entity = buyerMapper.toEntity(buyerDto);
         BuyerEntity saved = buyerRepository.save(entity);
 
-        return mapToDto(saved);
+        return buyerMapper.toDto(saved);
     }
 
     public BuyerDto get(Long id) {
         BuyerEntity entity = buyerRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Buyer not found"));
-        return mapToDto(entity);
+        return buyerMapper.toDto(entity);
     }
 
     @Transactional
@@ -51,16 +49,6 @@ public class BuyerService {
 
         entity.setBalance(entity.getBalance().add(amount));
 
-        return mapToDto(entity);
-    }
-
-    private BuyerDto mapToDto(BuyerEntity entity) {
-        return new BuyerDto(
-                entity.getId(),
-                entity.getName(),
-                entity.getEmail(),
-                entity.getBalance(),
-                entity.getCreatedAt()
-        );
+        return buyerMapper.toDto(buyerRepository.save(entity));
     }
 }

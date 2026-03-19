@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -39,6 +40,7 @@ public class ReviewEntity {
     private Integer rating;
 
     @Column(columnDefinition = "TEXT")
+    @Size(max = 1000)
     private String comment;
 
     @Column(name = "created_at")

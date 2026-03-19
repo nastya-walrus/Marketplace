@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.example.marketplace.dto.ProductDto;
 import org.example.marketplace.entity.ProductEntity;
+import org.example.marketplace.mapper.ProductMapper;
 import org.example.marketplace.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,18 +15,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final ProductMapper productMapper;
 
     @Transactional
     public ProductDto create(ProductDto productDto) {
 
-        ProductEntity entity = new ProductEntity();
-        entity.setName(productDto.getName());
-        entity.setDescription(productDto.getDescription());
-        entity.setPrice(productDto.getPrice());
-
+        ProductEntity entity = productMapper.toEntity(productDto);
         ProductEntity saved = productRepository.save(entity);
 
-        return mapToDto(saved);
+        return productMapper.toDto(saved);
     }
 
     public ProductDto get(Long id) {
@@ -33,16 +31,6 @@ public class ProductService {
         ProductEntity entity = productRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Product not found"));
 
-        return mapToDto(entity);
-    }
-
-    private ProductDto mapToDto(ProductEntity entity) {
-        return new ProductDto(
-                entity.getId(),
-                entity.getName(),
-                entity.getDescription(),
-                entity.getPrice(),
-                entity.getRating()
-        );
+        return productMapper.toDto(entity);
     }
 }
