@@ -1,0 +1,153 @@
+databaseChangeLog:
+  - changeSet:
+      id: 20240522-1
+      author: nastya
+      changes:
+        - createSequence:
+            sequenceName: purchase_id_seq
+            startValue: 1
+            incrementBy: 50
+        - createSequence:
+            sequenceName: review_id_seq
+            startValue: 1
+            incrementBy: 50
+        - createTable:
+            tableName: buyer
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: email
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: balance
+                  type: DECIMAL(19, 2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+
+        - createTable:
+            tableName: product
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: TEXT
+              - column:
+                  name: price
+                  type: DECIMAL(19, 2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: rating
+                  type: DECIMAL(3, 2)
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+        - createTable:
+            tableName: purchase
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  defaultValueComputed: nextval('purchase_id_seq')
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: buyer_id
+                  type: BIGINT
+              - column:
+                  name: product_id
+                  type: BIGINT
+              - column:
+                  name: price_at_purchase
+                  type: DECIMAL(19, 2)
+              - column:
+                  name: purchase_date
+                  type: TIMESTAMP
+        - createTable:
+            tableName: review
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  defaultValueComputed: nextval('review_id_seq')
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: buyer_id
+                  type: BIGINT
+              - column:
+                  name: product_id
+                  type: BIGINT
+              - column:
+                  name: rating
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: comment
+                  type: TEXT
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+
+        - addForeignKeyConstraint:
+            baseTableName: purchase
+            baseColumnNames: buyer_id
+            referencedTableName: buyer
+            referencedColumnNames: id
+            constraintName: fk_purchase_buyer
+        - addForeignKeyConstraint:
+            baseTableName: review
+            baseColumnNames: buyer_id
+            referencedTableName: buyer
+            referencedColumnNames: id
+            constraintName: fk_review_buyer
+        - addForeignKeyConstraint:
+            baseTableName: review
+            baseColumnNames: product_id
+            referencedTableName: product
+            referencedColumnNames: id
+            constraintName: fk_review_product
+
+        - createIndex:
+            indexName: idx_purchase_buyer_id
+            tableName: purchase
+            columns:
+              - column:
+                  name: buyer_id
+        - createIndex:
+            indexName: idx_review_product_id
+            tableName: review
+            columns:
+              - column:
+                  name: product_id
