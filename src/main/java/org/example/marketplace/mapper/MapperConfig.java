@@ -1,4 +1,4 @@
-package org.example.marketplace.configuration;
+package org.example.marketplace.mapper;
 
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;

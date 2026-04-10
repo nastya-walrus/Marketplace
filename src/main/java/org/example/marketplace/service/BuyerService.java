@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 
 
 @Service
@@ -21,7 +22,6 @@ public class BuyerService {
 
     private final BuyerRepository buyerRepository;
     private final BuyerMapper buyerMapper;
-    EntityConflictException entityConflictException;
 
     @Transactional
     public BuyerDto create(BuyerDto buyerDto) {
@@ -30,6 +30,7 @@ public class BuyerService {
             throw new EntityConflictException("Email already exists: " + buyerDto.getEmail());
         }
 
+        buyerDto.setCreatedAt(new Timestamp(System.currentTimeMillis()));
         BuyerEntity entity = buyerMapper.toEntity(buyerDto);
         BuyerEntity saved = buyerRepository.save(entity);
 

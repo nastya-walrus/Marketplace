@@ -28,7 +28,7 @@ import java.util.StringJoiner;
 public class ReviewEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
     private Long buyerId;

@@ -3,14 +3,6 @@ databaseChangeLog:
       id: 20240522-1
       author: nastya
       changes:
-        - createSequence:
-            sequenceName: purchase_id_seq
-            startValue: 1
-            incrementBy: 50
-        - createSequence:
-            sequenceName: review_id_seq
-            startValue: 1
-            incrementBy: 50
         - createTable:
             tableName: buyer
             columns:
@@ -76,7 +68,7 @@ databaseChangeLog:
               - column:
                   name: id
                   type: BIGINT
-                  defaultValueComputed: nextval('purchase_id_seq')
+                  autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
@@ -98,7 +90,7 @@ databaseChangeLog:
               - column:
                   name: id
                   type: BIGINT
-                  defaultValueComputed: nextval('review_id_seq')
+                  autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false

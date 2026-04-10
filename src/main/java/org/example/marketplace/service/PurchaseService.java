@@ -29,10 +29,10 @@ public class PurchaseService {
     public BuyResponseDto buy(Long productId, Long buyerId) {
 
         if(!buyerRepository.existsById(buyerId))
-            throw new EntityNotFoundException("Buyer not found");
+            throw new EntityNotFoundException("Buyer not found" + buyerId);
 
         ProductEntity product = productRepository.findById(productId)
-                .orElseThrow(() -> new EntityNotFoundException("Product not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Product not found" + productId));
 
         BigDecimal price = product.getPrice();
 
@@ -42,8 +42,8 @@ public class PurchaseService {
         }
 
         PurchaseEntity purchase = new PurchaseEntity();
-        purchase.setBuyerId(productId);
-        purchase.setProductId(buyerId);
+        purchase.setBuyerId(buyerId);
+        purchase.setProductId(productId);
         purchase.setPriceAtPurchase(price);
 
         PurchaseEntity saved = purchaseRepository.save(purchase);

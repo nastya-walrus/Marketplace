@@ -13,7 +13,7 @@ public class PurchaseController {
 
     private final PurchaseService purchaseService;
 
-    @PostMapping(" /products/{productId}/buy/{buyerId}")
+    @PostMapping("/purchase/products/{productId}/buy/{buyerId}")
     public BuyResponseDto buy(@PathVariable Long productId,
                               @PathVariable Long buyerId) {
         return purchaseService.buy(productId, buyerId);

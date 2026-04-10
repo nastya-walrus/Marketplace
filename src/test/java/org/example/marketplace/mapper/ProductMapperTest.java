@@ -10,7 +10,9 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.Instant;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class ProductMapperTest {
 
@@ -42,7 +44,6 @@ class ProductMapperTest {
         assertEquals(0, dto.getPrice().compareTo(new BigDecimal("999.99")));
         assertEquals(0, dto.getRating().compareTo(new BigDecimal("4.50")));
 
-        // createdAt отсутствует в DTO → просто убеждаемся, что маппинг прошёл
         assertNotNull(dto);
     }
 
@@ -64,7 +65,6 @@ class ProductMapperTest {
         assertEquals(0, entity.getPrice().compareTo(new BigDecimal("1999.99")));
         assertEquals(0, entity.getRating().compareTo(new BigDecimal("4.80")));
 
-        // createdAt не приходит из DTO → будет null
         assertNull(entity.getCreatedAt());
     }
 }
