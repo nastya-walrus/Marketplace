@@ -1,5 +1,6 @@
 package org.example.marketplace.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.marketplace.dto.BuyerDto;
 import org.example.marketplace.dto.request.DepositRequestDto;
@@ -18,7 +19,7 @@ public class BuyerController {
     private final BuyerService buyerService;
 
     @PostMapping("/buyers")
-    public BuyerDto createBuyer(@RequestBody BuyerDto buyerDto) {
+    public BuyerDto createBuyer(@RequestBody @Valid BuyerDto buyerDto) {
         return buyerService.create(buyerDto);
     }
 

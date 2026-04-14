@@ -50,16 +50,20 @@ public class ProductEntity {
     @CreatedDate
     private Timestamp createdAt;
 
+    @Column(name = "updated_at")
+    @CreatedDate
+    private Timestamp updatedAt;
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         ProductEntity that = (ProductEntity) o;
-        return Objects.equals(id, that.id) && Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(price, that.price) && Objects.equals(rating, that.rating) && Objects.equals(createdAt, that.createdAt);
+        return Objects.equals(id, that.id) && Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(price, that.price) && Objects.equals(rating, that.rating) && Objects.equals(createdAt, that.createdAt) && Objects.equals(updatedAt, that.updatedAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, price, rating, createdAt);
+        return Objects.hash(id, name, description, price, rating, createdAt, updatedAt);
     }
 
     @Override
@@ -71,6 +75,7 @@ public class ProductEntity {
                 .add("price=" + price)
                 .add("rating=" + rating)
                 .add("createdAt=" + createdAt)
+                .add("updatedAt=" + updatedAt)
                 .toString();
     }
 }

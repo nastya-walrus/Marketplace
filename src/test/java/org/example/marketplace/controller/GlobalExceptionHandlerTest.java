@@ -1,20 +1,16 @@
 package org.example.marketplace.controller;
 
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.ConstraintViolationException;
-import jakarta.validation.Path;
 import org.example.marketplace.exception.EntityConflictException;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
-import java.util.Set;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class GlobalExceptionHandlerTest {
 
@@ -31,25 +27,37 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    void onConstraintViolationException() {
-        ConstraintViolation<?> violation = mock(ConstraintViolation.class);
+    void handleValidationException() {
+        MethodArgumentNotValidException ex =
+                org.mockito.Mockito.mock(MethodArgumentNotValidException.class);
 
-        Path path = mock(Path.class);
-        when(path.toString()).thenReturn("fieldName");
+        org.springframework.validation.BindingResult bindingResult =
+                org.mockito.Mockito.mock(org.springframework.validation.BindingResult.class);
 
-        when(violation.getInvalidValue()).thenReturn("bad_value");
-        when(violation.getPropertyPath()).thenReturn(path);
-        when(violation.getMessage()).thenReturn("must not be null");
+        org.springframework.validation.FieldError fieldError =
+                new org.springframework.validation.FieldError("object", "field", "must not be null");
 
-        Set<ConstraintViolation<?>> violations = Set.of(violation);
+        org.mockito.Mockito.when(ex.getBindingResult()).thenReturn(bindingResult);
+        org.mockito.Mockito.when(bindingResult.getFieldErrors())
+                .thenReturn(java.util.List.of(fieldError));
 
-        ConstraintViolationException ex =
-                new ConstraintViolationException("Validation failed", violations);
-
-        ResponseEntity<String> response = handler.onConstraintViolationException(ex);
+        ResponseEntity<String> response = handler.handleValidationException(ex);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertTrue(response.getBody().contains("fieldName"));
+        assertTrue(response.getBody().contains("field"));
+    }
+
+    @Test
+    void handleNotReadable() {
+        HttpInputMessage inputMessage = org.mockito.Mockito.mock(HttpInputMessage.class);
+
+        HttpMessageNotReadableException ex =
+                new HttpMessageNotReadableException("Bad JSON", inputMessage);
+
+        ResponseEntity<String> response = handler.handleNotReadable(ex);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertTrue(response.getBody().contains("Некорректный JSON"));
     }
 
     @Test

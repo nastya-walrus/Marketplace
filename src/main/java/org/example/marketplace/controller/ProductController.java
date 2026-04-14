@@ -1,5 +1,6 @@
 package org.example.marketplace.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.marketplace.dto.ProductDto;
 import org.example.marketplace.service.ProductService;
@@ -18,7 +19,7 @@ public class ProductController {
     private final ProductService productService;
 
     @PostMapping()
-    public ProductDto create(@RequestBody ProductDto productDto) {
+    public ProductDto create(@RequestBody @Valid ProductDto productDto) {
         return productService.create(productDto);
     }
 

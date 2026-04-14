@@ -33,6 +33,7 @@ class ProductMapperTest {
                 "Smartphone",
                 new BigDecimal("999.99"),
                 new BigDecimal("4.50"),
+                now,
                 now
         );
 
