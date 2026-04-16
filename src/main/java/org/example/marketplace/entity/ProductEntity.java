@@ -1,33 +1,28 @@
 package org.example.marketplace.entity;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
+import org.springframework.data.annotation.CreatedDate;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
+import java.sql.Timestamp;
+import java.util.Objects;
+import java.util.StringJoiner;
 
 @Entity
-@Table(name = "products")
+@Table(name = "product")
 @Getter
 @Setter
-@EqualsAndHashCode
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductEntity {
@@ -52,13 +47,35 @@ public class ProductEntity {
     private BigDecimal rating;
 
     @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    @CreatedDate
+    private Timestamp createdAt;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    private List<ReviewEntity> reviews;
+    @Column(name = "updated_at")
+    @CreatedDate
+    private Timestamp updatedAt;
 
-    @PrePersist
-    public void prePersist() {
-        createdAt = LocalDateTime.now();
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        ProductEntity that = (ProductEntity) o;
+        return Objects.equals(id, that.id) && Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(price, that.price) && Objects.equals(rating, that.rating) && Objects.equals(createdAt, that.createdAt) && Objects.equals(updatedAt, that.updatedAt);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, description, price, rating, createdAt, updatedAt);
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", ProductEntity.class.getSimpleName() + "[", "]")
+                .add("id=" + id)
+                .add("name='" + name + "'")
+                .add("description='" + description + "'")
+                .add("price=" + price)
+                .add("rating=" + rating)
+                .add("createdAt=" + createdAt)
+                .add("updatedAt=" + updatedAt)
+                .toString();
     }
 }

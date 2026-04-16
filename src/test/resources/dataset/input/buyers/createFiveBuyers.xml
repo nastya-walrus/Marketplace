@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+    <buyer
+            id="1"
+            name="Petya"
+            email="pit@google.com"
+            balance="567"
+            created_at="2025-10-10 15:20:00"
+    />
+    <buyer
+            id="2"
+            name="Petya2"
+            email="pit2@google.com"
+            balance="5671"
+            created_at="2025-04-10 15:00:00"
+    />
+    <buyer
+            id="3"
+            name="Petya3"
+            email="pit3@google.com"
+            balance="5672"
+            created_at="2025-10-17 15:00:00"
+    />
+    <buyer
+            id="4"
+            name="Petya4"
+            email="pit4@google.com"
+            balance="5673"
+            created_at="2025-10-15 15:00:00"
+    />
+    <buyer
+            id="5"
+            name="Petya5"
+            email="pit5@google.com"
+            balance="12"
+            created_at="2025-10-15 15:00:01"
+    />
+</dataset>
