@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.marketplace.dto.ReviewDto;
 import org.example.marketplace.dto.request.ReviewRequestDto;
 import org.example.marketplace.service.ReviewService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,9 +17,10 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     @PostMapping("/review/products/{productId}")
-    public ReviewDto review(@PathVariable Long productId,
-                            @RequestBody ReviewRequestDto reviewRequestDto) {
+    public ResponseEntity<ReviewDto> review(@PathVariable Long productId,
+                                            @RequestBody ReviewRequestDto reviewRequestDto) {
 
-        return reviewService.review(productId, reviewRequestDto);
+        ReviewDto review = reviewService.review(productId, reviewRequestDto);
+        return ResponseEntity.ok(review);
     }
 }

@@ -24,7 +24,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -43,62 +42,72 @@ class PurchaseServiceTest {
     private PurchaseService purchaseService;
 
     @Test
-    void buy_shouldRefund_ifBuyerNotFound() {
-        when(buyerRepository.existsById(1L)).thenReturn(false);
-
-        assertThrows(EntityNotFoundException.class,
-                () -> purchaseService.buy(10L, 1L));
-
-        verify(buyerRepository).existsById(1L);
-        verifyNoMoreInteractions(productRepository, purchaseRepository);
-    }
-
-    @Test
-    void buy_shouldRefund_ifProductNotFound() {
-        when(buyerRepository.existsById(1L)).thenReturn(true);
+    void buy_shouldFail_ifProductNotFound() {
         when(productRepository.findById(10L)).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class,
                 () -> purchaseService.buy(10L, 1L));
 
-        verify(buyerRepository).existsById(1L);
         verify(productRepository).findById(10L);
-        verifyNoMoreInteractions(purchaseRepository);
+        verifyNoInteractions(buyerRepository, purchaseRepository);
     }
 
     @Test
-    void buy_shouldRefund_ifNotEnoughMoney() {
-        ProductEntity product = new ProductEntity();
-        product.setPrice(new BigDecimal("100.00"));
+    void buy_shouldFail_ifBuyerNotFound_afterWriteOff() {
+        BigDecimal price = new BigDecimal("100.00");
 
-        when(buyerRepository.existsById(1L)).thenReturn(true);
+        ProductEntity product = new ProductEntity();
+        product.setPrice(price);
+
         when(productRepository.findById(10L)).thenReturn(Optional.of(product));
-        when(buyerRepository.writeOffFunds(1L, new BigDecimal("100.00")))
-                .thenReturn(0);
+        when(buyerRepository.writeOffFunds(1L, price)).thenReturn(0);
+        when(buyerRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class,
+                () -> purchaseService.buy(10L, 1L));
+
+        verify(productRepository).findById(10L);
+        verify(buyerRepository).writeOffFunds(1L, price);
+        verify(buyerRepository).findById(1L);
+        verifyNoInteractions(purchaseRepository);
+    }
+
+    @Test
+    void buy_shouldFail_ifNotEnoughMoney() {
+        BigDecimal price = new BigDecimal("100.00");
+
+        ProductEntity product = new ProductEntity();
+        product.setPrice(price);
+
+        BuyerEntity buyer = new BuyerEntity();
+        buyer.setBalance(new BigDecimal("50.00"));
+
+        when(productRepository.findById(10L)).thenReturn(Optional.of(product));
+        when(buyerRepository.writeOffFunds(1L, price)).thenReturn(0);
+        when(buyerRepository.findById(1L)).thenReturn(Optional.of(buyer));
 
         assertThrows(InsufficientFundsException.class,
                 () -> purchaseService.buy(10L, 1L));
 
-        verify(buyerRepository).existsById(1L);
         verify(productRepository).findById(10L);
-        verify(buyerRepository).writeOffFunds(1L, new BigDecimal("100.00"));
+        verify(buyerRepository).writeOffFunds(1L, price);
+        verify(buyerRepository).findById(1L);
         verifyNoInteractions(purchaseRepository);
     }
 
     @Test
     void buy_shouldBuy() {
         BigDecimal price = new BigDecimal("100.00");
+
         ProductEntity product = new ProductEntity();
         product.setPrice(price);
 
         PurchaseEntity savedPurchase = new PurchaseEntity();
         savedPurchase.setId(5L);
 
-        BigDecimal balance = new BigDecimal("900.00");
         BuyerEntity buyer = new BuyerEntity();
-        buyer.setBalance(balance);
+        buyer.setBalance(new BigDecimal("900.00"));
 
-        when(buyerRepository.existsById(1L)).thenReturn(true);
         when(productRepository.findById(10L)).thenReturn(Optional.of(product));
         when(buyerRepository.writeOffFunds(1L, price)).thenReturn(1);
         when(purchaseRepository.save(any(PurchaseEntity.class)))
@@ -110,9 +119,8 @@ class PurchaseServiceTest {
 
         assertNotNull(result);
         assertEquals(5L, result.getPurchaseId());
-        assertEquals(0, result.getRemainingBalance().compareTo(balance));
+        assertEquals(0, result.getRemainingBalance().compareTo(buyer.getBalance()));
 
-        verify(buyerRepository).existsById(1L);
         verify(productRepository).findById(10L);
         verify(buyerRepository).writeOffFunds(1L, price);
         verify(purchaseRepository).save(any(PurchaseEntity.class));

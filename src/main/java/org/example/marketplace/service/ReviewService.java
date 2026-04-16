@@ -32,9 +32,6 @@ public class ReviewService {
         log.info("Start review: buyerId={}, productId={}, rating={}",
                 dto.getBuyerId(), productId, dto.getRating());
 
-        validateBuyerBoughtProduct(productId, dto);
-        validateBuyerHaveNotReviewedThisProductBefore(productId, dto);
-
         ProductEntity product = productRepository.findById(productId)
                 .orElseThrow(() -> {
                     log.warn("Review failed: product not found, productId={}", productId);
@@ -47,47 +44,50 @@ public class ReviewService {
                     return new EntityNotFoundException("User not found");
                 });
 
+        boolean purchased = purchaseRepository
+                .existsByBuyerIdAndProductId(buyer.getId(), product.getId());
+
+        if (!purchased) {
+            log.warn("Review failed: product not purchased, buyerId={}, productId={}",
+                    buyer.getId(), product.getId());
+            throw new IllegalStateException("This product is not purchased");
+        }
+
+        boolean reviewExists = reviewRepository
+                .existsByBuyerIdAndProductId(buyer.getId(), product.getId());
+
+        if (reviewExists) {
+            log.warn("Review failed: already reviewed, buyerId={}, productId={}",
+                    buyer.getId(), product.getId());
+            throw new IllegalStateException("This product is already reviewed");
+        }
+
         ReviewEntity review = new ReviewEntity();
         review.setBuyerId(buyer.getId());
         review.setProductId(product.getId());
         review.setRating(dto.getRating());
         review.setComment(dto.getComment());
 
-        ReviewEntity saved = reviewRepository.save(review);
+        try {
+            ReviewEntity saved = reviewRepository.save(review);
 
-        log.info("Review created: reviewId={}, buyerId={}, productId={}",
-                saved.getId(), buyer.getId(), product.getId());
+            log.info("Review created: reviewId={}, buyerId={}, productId={}",
+                    saved.getId(), buyer.getId(), product.getId());
 
-        log.debug("Review details: {}", saved);
+            return reviewMapper.toDto(saved);
 
-        return reviewMapper.toDto(saved);
-    }
+        } catch (Exception ex) {
+            log.warn("Review save failed, rechecking state. buyerId={}, productId={}",
+                    buyer.getId(), product.getId());
 
-    private void validateBuyerHaveNotReviewedThisProductBefore(Long productId, ReviewRequestDto dto) {
-        boolean reviewExists = reviewRepository.existsByBuyerIdAndProductId(
-                dto.getBuyerId(), productId);
+            boolean existsNow = reviewRepository
+                    .existsByBuyerIdAndProductId(buyer.getId(), product.getId());
 
-        if (reviewExists) {
-            log.warn("Validation failed: review already exists, buyerId={}, productId={}",
-                    dto.getBuyerId(), productId);
-            throw new IllegalStateException("This product is already reviewed");
+            if (existsNow) {
+                throw new IllegalStateException("This product is already reviewed");
+            }
+
+            throw ex;
         }
-
-        log.debug("Validation passed: no existing review, buyerId={}, productId={}",
-                dto.getBuyerId(), productId);
-    }
-
-    private void validateBuyerBoughtProduct(Long productId, ReviewRequestDto dto) {
-        boolean purchased = purchaseRepository
-                .existsByBuyerIdAndProductId(dto.getBuyerId(), productId);
-
-        if (!purchased) {
-            log.warn("Validation failed: product not purchased, buyerId={}, productId={}",
-                    dto.getBuyerId(), productId);
-            throw new IllegalStateException("This product is not purchased");
-        }
-
-        log.debug("Validation passed: product purchased, buyerId={}, productId={}",
-                dto.getBuyerId(), productId);
     }
 }
